@@ -1,0 +1,39 @@
+require('dotenv/config')
+const {REST, Routes, SlashCommandBuilder } = require('discord.js')
+//info needed to create slash comands
+const botID= "1250664869859168266"
+const serverID = "1250018152235008072"
+const botToken = process.env.BOT_TOKEN
+
+const rest = new REST().setToken(botToken)
+const commandRegister = async () => {
+    try {
+        //clear all commands to avoid duplicates
+            await rest.put(Routes.applicationGuildCommands(botID, serverID), { body: [] })
+            .then(() => console.log('Successfully deleted all commands.'))
+            .catch(console.error);
+
+        //when done for multi-server registration do:
+        //await rest.put(Routes.applicationCommands(botID)
+
+        await rest.put(Routes.applicationGuildCommands(botID,serverID),
+        {
+        body: [
+            new SlashCommandBuilder()
+            .setName("nominate")
+            .setDescription("This command nominates a player for promotion")
+            .addUserOption(option => { 
+                return option
+                .setName("member")
+                .setDescription("The member to be nominated")
+                .setRequired(true)})
+        ]
+        })
+        
+        console.log("Successfully registered application commands")
+    }catch(error) {
+        console.error(error)
+    }
+}
+
+commandRegister();
