@@ -13,37 +13,54 @@ client.on("interactionCreate", async (interaction) =>{
   if(interaction.isCommand()){
   if(interaction.commandName === "nominate")
   {
-    // ephemeral: true makes it so only user can see it
-    interaction.reply(
-    {
+  await interaction.reply({
       content:"You nominated: " + interaction.options.getMember("member").displayName,
-      ephemeral:true
-    })
-  const thread = await interaction.channel.threads.create({
+      ephemeral:true,
+  }).then(async () => {
+    const thread = await interaction.channel.threads.create({
       name: 'Nominated: ' + interaction.options.getMember("member").displayName,
       autoArchiveDuration: 60,
 	  reason: 'Thread for voting on member promotion',
   });
-  const pqm = PollQuestionMedia(
-    "Should "+ interaction.options.getMember("member").displayName+ " be promoted?"
+  return thread
+  }).then(async (thread) => {
+    const poll = Discord.PollData ={
+      question: {
+        text: "Should " + interaction.options.getMember("member").displayName + " be promoted?",
+    },
+    answers: [
+        {
+            text: 'Yes',
+            emoji: "💪",
+        },
+        {
+            text: 'No',
+            emoji: "📉",
+        },
+    ],
+    duration: 336, // 2 Weeks
+    allowMultiselect: false,
+    layoutType: Discord.PollLayoutType.Default, // Single type (optional)
+    }
+    await thread.members.add(interaction.user)
+    await thread.send(
+      {
+        content:"",
+        poll:poll
+      })
+  }
   )
-  const answers = [{1:"Yes"},{2:"No"}]
-  const nomPoll = await Discord.Poll(
-    'Nominated: ' + interaction.options.getMember("member").displayName,
-  pqm,
-  answers,
-  1000000,
-  false,
-  1,
-  false,
-  end("Promoted")
-  )
- 
-  await thread.send(
-    {
-      content:nomPoll,
-    })
-  await thread.members.add(interaction.options.getMember("member"))
+
+  // const player = await interaction.options.getMember("member").displayName
+  // const question = await "Should the nominated player be promoted?"
+  // const answers = await [{1:"Yes"},{2:"No"}]
+  // const nomPoll = await new Discord.Poll(client,{
+  // player,
+  // question: question,
+  // answers: answers,
+  // expiresTimestamp: 1000000,
+  // allowMultiselect:false,
+  // layoutType:1}
   }
   }
 });
