@@ -27,6 +27,14 @@ const commandRegister = async () => {
                 .setName("member")
                 .setDescription("The member to be nominated")
                 .setRequired(true)})
+            .addStringOption(option =>
+                option.setName('role')
+                    .setDescription('Role for promotion')
+                    .setRequired(true)
+                    .addChoices(
+                        { name: 'BLANK', value: '1250623077214191678' },
+                        { name: 'Member', value: '1250627277868240936' },
+                    )),
         ]
         })
         

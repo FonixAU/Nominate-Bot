@@ -10,60 +10,65 @@ client.on('ready', () => {
 });
 
 client.on("interactionCreate", async (interaction) =>{
-  if(interaction.isCommand()){
-  if(interaction.commandName === "nominate")
-  {
-  await interaction.reply({
-      content:"You nominated: " + interaction.options.getMember("member").displayName,
-      ephemeral:true,
-  }).then(async () => {
+  if(interaction.isCommand() && interaction.commandName === "nominate"){
+    const roleCompare = await interaction.member.roles.highest.comparePositionTo(interaction.options.getString("role"));
+    if(roleCompare >= 0){
+    try {
+      const nominee = interaction.options.getMember("member").displayName
+      const roleName = interaction.guild.roles.cache.get(interaction.options.getString("role")).name
+      await interaction.reply({
+        content:"You nominated: " + nominee + " for promotion to: " + roleName,
+        ephemeral:true,
+    }).then(async () => {
     const thread = await interaction.channel.threads.create({
-      name: 'Nominated: ' + interaction.options.getMember("member").displayName,
-      autoArchiveDuration: 60,
-	  reason: 'Thread for voting on member promotion',
-  });
-  return thread
-  }).then(async (thread) => {
-    const poll = Discord.PollData ={
-      question: {
-        text: "Should " + interaction.options.getMember("member").displayName + " be promoted?",
-    },
-    answers: [
+        name: 'Nominated: ' + nominee + ' for ' + roleName,
+        autoArchiveDuration: 60,
+      reason: 'Thread for voting on member promotion',
+    });
+    return thread
+    }).then(async (thread) => {
+      const poll = Discord.PollData ={
+        question: {
+          text: "Should " + nominee + " be promoted to " + roleName + "?",
+      },
+      answers: [
+          {
+              text: 'Yes',
+              emoji: "💪",
+          },
+          {
+              text: 'No',
+              emoji: "📉",
+          },
+      ],
+      duration: 100, // 100 hours
+      allowMultiselect: false,
+      layoutType: Discord.PollLayoutType.Default, // Single type (optional)
+      }
+      await thread.members.add(interaction.user)
+      await thread.send(
         {
-            text: 'Yes',
-            emoji: "💪",
-        },
-        {
-            text: 'No',
-            emoji: "📉",
-        },
-    ],
-    duration: 336, // 2 Weeks
-    allowMultiselect: false,
-    layoutType: Discord.PollLayoutType.Default, // Single type (optional)
-    }
-    await thread.members.add(interaction.user)
-    await thread.send(
-      {
-        content:"",
-        poll:poll
+          content:"",
+          poll:poll
+        })
       })
+    } catch (error) {
+      console.error(error)
+    }
   }
-  )
-
-  // const player = await interaction.options.getMember("member").displayName
-  // const question = await "Should the nominated player be promoted?"
-  // const answers = await [{1:"Yes"},{2:"No"}]
-  // const nomPoll = await new Discord.Poll(client,{
-  // player,
-  // question: question,
-  // answers: answers,
-  // expiresTimestamp: 1000000,
-  // allowMultiselect:false,
-  // layoutType:1}
-  }
-  }
-});
+  // else if(roleCompare > 0){
+  //   await interaction.reply({
+  //     content:"You promoted: " + nominee + " to: " + roleName,
+  //     ephemeral:false,
+  // })
+  // }
+  else{
+    await interaction.reply({
+      content:"You cannot nominate someone for a role higher than your own",
+      ephemeral:true,
+  })
+  }}
+  });
 
 client.login(process.env.BOT_TOKEN);
 
