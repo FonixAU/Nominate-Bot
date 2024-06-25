@@ -137,14 +137,14 @@ client.on('interactionCreate', async (interaction) =>{
     allowMultiselect: false,
     layoutType: Discord.PollLayoutType.Default, // Single type (optional)
     }
-    // if(roleCompare >=1){
-    //   await interaction.reply({
-    //     content:"You promoted: " + nomineeName + " to: " + roleName,
-    //     ephemeral:false,
-    // }).then(async () => {
-    //   nominee.roles.add(role)
-    // })}
-    // else 
+    if(roleCompare >=1){
+      await interaction.reply({
+        content:"You promoted: " + nomineeName + " to: " + roleName,
+        ephemeral:false,
+    }).then(async () => {
+      nominee.roles.add(role)
+    })}
+    else 
     if(await roleCompare >= 0){
       await interaction.reply({
         content:"You nominated: " + nomineeName + " for promotion to: " + roleName,
