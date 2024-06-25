@@ -19,24 +19,20 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
   const voter = await guild.members.fetch(userID)
   const splitMessage = await poll.question.text.split(" ",2)
   const nominee = await (await guild.members.search({query:splitMessage[1],limit:1,cache:true})).at(0)
-
   try{
   if(poll.question.text.includes("BLANK")){
     const role = await guild.roles.cache.get(BLANK)
     const roleCompare = await voter.roles.highest.comparePositionTo(role);
     if(roleCompare >=1){
       await poll.message.reply({
-        content:voter.nickname + " overwrote this poll's results",
+        content:voter.displayName + " overwrote this poll's results",
         ephemeral:false,
     }).then(async () => {
       await nominee.roles.add(role)
-
     }).then(async () => {
+      await poll.message.thread.setLocked(true)
       await poll.message.thread.setArchived(true)
-        await poll.message.thread.setLocked(true)
       await poll.message.delete()
-      
-      await console.log(role.guild.cache.memberCount)
     })
     }
     else 
@@ -44,27 +40,24 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
       if(total / role.members.size >= 0.7){
         if(total / totalYes >= 0.6){
           await poll.message.reply({
-            content:"Successful Promotion: " + splitMessage[1],
+            content:"Successful Promotion: " + nominee.displayName,
             ephemeral:false,
         }).then(async () => {
           await nominee.roles.add(role)
-    
         }).then(async () => {
-          await poll.message.delete()
+          await poll.message.thread.setLocked(true)
           await poll.message.thread.setArchived(true)
-        await poll.message.thread.setLocked(true)
+          await poll.message.delete()
         })
         }else
         if(total / totalNo >= 0.6){
           await poll.message.reply({
-            content:"Unsuccessful Promotion: " + splitMessage[1],
+            content:"Unsuccessful Promotion: " + nominee.displayName,
             ephemeral:false,
         }).then(async () => {
-          await poll.message.delete()
+          await poll.message.thread.setLocked(true)
           await poll.message.thread.setArchived(true)
-      
-        await poll.message.thread.setLocked(true)
-
+          await poll.message.delete()
         })
         }
       }
@@ -80,11 +73,9 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
       await nominee.roles.add(role)
 
     }).then(async () => {
+      await poll.message.thread.setLocked(true)
       await poll.message.thread.setArchived(true)
-        await poll.message.thread.setLocked(true)
       await poll.message.delete()
-      
-
     })
     }
     else 
@@ -92,29 +83,25 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
       if(total / role.members.size >= 0.7){
         if(total / totalYes >= 0.6){
           await poll.message.reply({
-            content:"Successful Promotion: " + splitMessage[1],
+            content:"Successful Promotion: " + nominee.displayName,
             ephemeral:false,
         }).then(async () => {
           await nominee.roles.add(role)
     
         }).then(async () => {
-          await poll.message.delete()
+          await poll.message.thread.setLocked(true)
           await poll.message.thread.setArchived(true)
-      
-        await poll.message.thread.setLocked(true)
-
+          await poll.message.delete()
         })
         }else
         if(total / totalNo >= 0.6){
           await poll.message.reply({
-            content:"Unsuccessful Promotion: " + splitMessage[1],
+            content:"Unsuccessful Promotion: " + nominee.displayName,
             ephemeral:false,
         }).then(async () => {
-          await poll.message.delete()
+          await poll.message.thread.setLocked(true)
           await poll.message.thread.setArchived(true)
-      
-        await poll.message.thread.setLocked(true)
-
+          await poll.message.delete()
         })
         }
       }
