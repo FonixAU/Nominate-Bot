@@ -2,7 +2,7 @@ require('dotenv/config')
 const {REST, Routes, SlashCommandBuilder } = require('discord.js')
 //info needed to create slash comands
 const botID= "1250664869859168266"
-const serverID = "1250018152235008072"
+const serverID = process.env.GUILD_ID
 const botToken = process.env.BOT_TOKEN
 
 const rest = new REST().setToken(botToken)
