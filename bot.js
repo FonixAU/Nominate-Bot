@@ -16,68 +16,112 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
   const totalYes = await poll.answers.at(0).voteCount
   const totalNo = await poll.answers.at(1).voteCount
   const guild = await client.guilds.cache.get(process.env.GUILD_ID)
-  const gmember = await guild.members.fetch(userID)
-  console.log(totalYes)
+  const voter = await guild.members.fetch(userID)
+  const splitMessage = await poll.question.text.split(" ",2)
+  const nominee = await (await guild.members.search({query:splitMessage[1],limit:1,cache:true})).at(0)
+
   try{
   if(poll.question.text.includes("BLANK")){
     const role = await guild.roles.cache.get(BLANK)
-    const roleCompare = await gmember.roles.highest.comparePositionTo(role);
+    const roleCompare = await voter.roles.highest.comparePositionTo(role);
     if(roleCompare >=1){
       await poll.message.reply({
-        content:"You overwrote this poll's results",
+        content:voter.nickname + " overwrote this poll's results",
         ephemeral:false,
     }).then(async () => {
-      nominee.roles.add(role)
+      await nominee.roles.add(role)
+
     }).then(async () => {
-      poll.message.delete()
+      await poll.message.thread.setArchived(true)
+        await poll.message.thread.setLocked(true)
+      await poll.message.delete()
+      
+      await console.log(role.guild.cache.memberCount)
     })
     }
     else 
     if(await roleCompare >= 0){
       if(total / role.members.size >= 0.7){
         if(total / totalYes >= 0.6){
-          poll.message.delete()
-        }
+          await poll.message.reply({
+            content:"Successful Promotion: " + splitMessage[1],
+            ephemeral:false,
+        }).then(async () => {
+          await nominee.roles.add(role)
+    
+        }).then(async () => {
+          await poll.message.delete()
+          await poll.message.thread.setArchived(true)
+        await poll.message.thread.setLocked(true)
+        })
+        }else
         if(total / totalNo >= 0.6){
-        
+          await poll.message.reply({
+            content:"Unsuccessful Promotion: " + splitMessage[1],
+            ephemeral:false,
+        }).then(async () => {
+          await poll.message.delete()
+          await poll.message.thread.setArchived(true)
+      
+        await poll.message.thread.setLocked(true)
+
+        })
         }
       }
-      console.log(role.members.size)
-
     }
   }else if(poll.question.text.includes("Member")){
-    const role = await guild.roles.cache.get(Member)
-    const roleCompare = await gmember.roles.highest.comparePositionTo(role);
+    const role = await guild.roles.cache.get(BLANK)
+    const roleCompare = await voter.roles.highest.comparePositionTo(role);
     if(roleCompare >=1){
-      await interaction.reply({
-        content:"You promoted: " + nomineeName + " to: " + roleName,
+      await poll.message.reply({
+        content:voter.nickname + " overwrote this poll's results",
         ephemeral:false,
     }).then(async () => {
-      nominee.roles.add(role)
-    })}
+      await nominee.roles.add(role)
+
+    }).then(async () => {
+      await poll.message.thread.setArchived(true)
+        await poll.message.thread.setLocked(true)
+      await poll.message.delete()
+      
+
+    })
+    }
     else 
     if(await roleCompare >= 0){
-      if(total / role.members.size >= 0.5){
+      if(total / role.members.size >= 0.7){
+        if(total / totalYes >= 0.6){
+          await poll.message.reply({
+            content:"Successful Promotion: " + splitMessage[1],
+            ephemeral:false,
+        }).then(async () => {
+          await nominee.roles.add(role)
+    
+        }).then(async () => {
+          await poll.message.delete()
+          await poll.message.thread.setArchived(true)
+      
+        await poll.message.thread.setLocked(true)
 
+        })
+        }else
+        if(total / totalNo >= 0.6){
+          await poll.message.reply({
+            content:"Unsuccessful Promotion: " + splitMessage[1],
+            ephemeral:false,
+        }).then(async () => {
+          await poll.message.delete()
+          await poll.message.thread.setArchived(true)
+      
+        await poll.message.thread.setLocked(true)
+
+        })
+        }
       }
-      console.log(role.members.size)
-
-    }
-
-
-  }
+    }}
   }catch(e){
     console.log(e)
-  }
-  console.log(total)
-  // const voters = await pollVote.fetchVoters()
-  
-  
-  // await poll.answers.each(answer =>{
-  //   const count = answer.voteCount
-  //   console.log(count)
-  // })
-  
+  }  
 })
 
 client.on('interactionCreate', async (interaction) =>{
@@ -88,6 +132,24 @@ client.on('interactionCreate', async (interaction) =>{
     const role = await interaction.guild.roles.cache.get(interaction.options.getString("role"))
     const nomineeName = await nominee.displayName
     const roleName = await role.name
+    const poll = Discord.PollData ={
+      question: {
+        text: "Should " + nomineeName + " be promoted to " + roleName + "?",
+    },
+    answers: [
+        {
+            text: 'Yes',
+            emoji: "💪",
+        },
+        {
+            text: 'No',
+            emoji: "📉",
+        },
+    ],
+    duration: 1, // 100 hours
+    allowMultiselect: false,
+    layoutType: Discord.PollLayoutType.Default, // Single type (optional)
+    }
     // if(roleCompare >=1){
     //   await interaction.reply({
     //     content:"You promoted: " + nomineeName + " to: " + roleName,
@@ -101,39 +163,18 @@ client.on('interactionCreate', async (interaction) =>{
         content:"You nominated: " + nomineeName + " for promotion to: " + roleName,
         ephemeral:true,
     }).then(async () => {
-    const thread = await interaction.channel.threads.create({
-        name: 'Nominated: ' + nomineeName + ' for ' + roleName,
-        autoArchiveDuration: 60,
-      reason: 'Thread for voting on member promotion',
-    });
-    return thread
-    }).then(async (thread) => {
-      const poll = Discord.PollData ={
-        question: {
-          text: "Should " + nomineeName + " be promoted to " + roleName + "?",
-      },
-      answers: [
-          {
-              text: 'Yes',
-              emoji: "💪",
-          },
-          {
-              text: 'No',
-              emoji: "📉",
-          },
-      ],
-      duration: 1, // 100 hours
-      allowMultiselect: false,
-      layoutType: Discord.PollLayoutType.Default, // Single type (optional)
-      }
-      await thread.members.add(interaction.user)
-      await thread.send(
-        {
-          content:"",
-          poll:poll
+    await interaction.channel.send(
+    {content:"",
+    poll:poll
+    }).then(
+      async (message) => {
+        await message.startThread({
+          name: 'Nominated: ' + nomineeName + ' for ' + roleName,
+              autoArchiveDuration: 60,
+            reason: 'Thread for voting on member promotion',
         })
-      })
-      console.log("Thread + Poll Created")
+      }
+    )})     
   }
   else{
     await interaction.reply({
