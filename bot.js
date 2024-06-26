@@ -65,47 +65,19 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
   }else if(poll.question.text.includes("Member")){
     const role = await guild.roles.cache.get(BLANK)
     const roleCompare = await voter.roles.highest.comparePositionTo(role);
-    if(roleCompare >=1){
+    if(roleCompare >=0){
       await poll.message.reply({
         content:voter.nickname + " overwrote this poll's results",
         ephemeral:false,
     }).then(async () => {
       await nominee.roles.add(role)
-
     }).then(async () => {
       await poll.message.thread.setLocked(true)
       await poll.message.thread.setArchived(true)
       await poll.message.delete()
     })
     }
-    else 
-    if(await roleCompare >= 0){
-      if(total / role.members.size >= 0.7){
-        if(total / totalYes >= 0.6){
-          await poll.message.reply({
-            content:"Successful Promotion: " + nominee.displayName,
-            ephemeral:false,
-        }).then(async () => {
-          await nominee.roles.add(role)
-    
-        }).then(async () => {
-          await poll.message.thread.setLocked(true)
-          await poll.message.thread.setArchived(true)
-          await poll.message.delete()
-        })
-        }else
-        if(total / totalNo >= 0.6){
-          await poll.message.reply({
-            content:"Unsuccessful Promotion: " + nominee.displayName,
-            ephemeral:false,
-        }).then(async () => {
-          await poll.message.thread.setLocked(true)
-          await poll.message.thread.setArchived(true)
-          await poll.message.delete()
-        })
-        }
-      }
-    }}
+    }
   }catch(e){
     console.log(e)
   }  
