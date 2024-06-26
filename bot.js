@@ -1,4 +1,5 @@
 require('dotenv/config')
+const express = require("express"); const app = express(); app.get("/", (req, res) => { res.send("Express on Vercel"); }); const PORT = process.env.PORT || 5000; app.listen(PORT, () => { console.log(`Server is running on port ${PORT}`); });
 
 const Discord = require('discord.js')
 const client = new Discord.Client({ intents: ['Guilds','GuildMessagePolls']})
@@ -63,7 +64,7 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
       }
     }
   }else if(poll.question.text.includes("Member")){
-    const role = await guild.roles.cache.get(BLANK)
+    const role = await guild.roles.cache.get(Member)
     const roleCompare = await voter.roles.highest.comparePositionTo(role);
     if(roleCompare >=0){
       await poll.message.reply({
@@ -149,6 +150,6 @@ client.on('interactionCreate', async (interaction) =>{
 
 client.login(process.env.BOT_TOKEN);
 
+module.exports = app
 
-BOT_PREFIX = "/"
-NOMINATE_COMMAND = "nominate"
+
