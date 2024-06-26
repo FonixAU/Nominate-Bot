@@ -5,8 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "dev": "nodemon bot.js",
-    "start": "node bot.js",
-    "build": "node build bot.js"
+    "start": "node bot.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,7 +13,6 @@
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.9",
-    "express": "^4.19.2",
     "index.js": "^0.0.3",
     "touch": "^3.1.1"
   },

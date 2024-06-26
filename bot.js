@@ -1,5 +1,4 @@
 require('dotenv/config')
-const express = require("express"); const app = express(); app.get("/", (req, res) => { res.send("Express on Vercel"); }); const PORT = process.env.PORT || 5000; app.listen(PORT, () => { console.log(`Server is running on port ${PORT}`); });
 
 const Discord = require('discord.js')
 const client = new Discord.Client({ intents: ['Guilds','GuildMessagePolls']})
@@ -150,6 +149,6 @@ client.on('interactionCreate', async (interaction) =>{
 
 client.login(process.env.BOT_TOKEN);
 
-module.exports = app
+
 
 
