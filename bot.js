@@ -6,7 +6,7 @@ const BLANK = '1250623077214191678'
 const Member = '1250627277868240936'
 
 client.on('ready', () => {
-  // console.log(`Logged in as ${client.user.tag}!`)
+  // console.log(Logged in as ${client.user.tag}!)
   console.log('Bot turned on')
 });
 
@@ -29,16 +29,14 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
     //     content:voter.displayName + " overwrote this poll's results",
     //     ephemeral:false,
     // }).then(async () => {
-    //  if(pollVote.text == "Yes"){}
-    //   await nominee.roles.add(role)}
-    //  
+    //   await nominee.roles.add(role)
     // }).then(async () => {
     //   await poll.message.thread.setLocked(true)
     //   await poll.message.thread.setArchived(true)
     //   await poll.message.delete()
     // })
     // }
-    // else
+    // else 
     if(await roleCompare >= 0){
       if(total / role.members.size >= 0.7){
         if(total / totalYes >= 0.6){
@@ -113,72 +111,68 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
   }  
 });
 
-client.on('interactionCreate', async (interaction) => {
-  if (interaction.isCommand() && interaction.commandName === 'nominate') {
-    const roleCompare = await interaction.member.roles.highest.comparePositionTo(interaction.options.getString('role'));
+client.on('interactionCreate', async (interaction) =>{
+  if(await interaction.isCommand() && await interaction.commandName === "nominate"){
+    const roleCompare = await interaction.member.roles.highest.comparePositionTo(interaction.options.getString("role"));
     try {
-      const nominee = await interaction.options.getMember('member');
-      const role = await interaction.guild.roles.cache.get(interaction.options.getString('role'));
-      const nomineeName = await nominee.displayName;
-      const roleName = await role.name;
-
-      const poll = {
-        question: {
-          text: "Should " + nomineeName + " be promoted to " + roleName + "?",
-        },
-        answers: [
-          {
+    const nominee = await interaction.options.getMember("member")
+    const role = await interaction.guild.roles.cache.get(interaction.options.getString("role"))
+    const nomineeName = await nominee.displayName
+    const roleName = await role.name
+    const poll = Discord.PollData ={
+      question: {
+        text: "Should " + nomineeName + " be promoted to " + roleName + "?",
+    },
+    answers: [
+        {
             text: 'Yes',
             emoji: "💪",
-          },
-          {
+        },
+        {
             text: 'No',
             emoji: "📉",
-          },
-        ],
-        duration: 100, // 100 hours
-        allowMultiselect: false,
-        layoutType: 'DEFAULT', // Single type (optional)
-      };
-
-      if(roleCompare >= 1 && role.id == Member) {
-        await interaction.reply({
-          content: "You promoted: " + nomineeName + " to: " + roleName,
-          ephemeral: false,
-        }).then(async () => {
-          nominee.roles.add(role);
-        });
-      } else 
-      if (roleCompare >= 0) {
-        await interaction.reply({
-          content: "You nominated: " + nomineeName + " for promotion to: " + roleName,
-          ephemeral: true,
-        }).then(async () => {
-          await interaction.channel.send({
-            content: "",
-            embeds: [poll]
-          }).then(async (message) => {
-            await message.startThread({
-              name: 'Nominated: ' + nomineeName + ' for ' + roleName,
-              autoArchiveDuration: 60,
-              reason: 'Thread for voting on member promotion',
-            });
-          });
-        });
-      } else {
-        await interaction.reply({
-          content: "You cannot nominate someone for a role higher than your own",
-          ephemeral: true,
-        });
-      }
-    } catch (error) {
-      console.log(error);
+        },
+    ],
+    duration: 100, // 100 hours
+    allowMultiselect: false,
+    layoutType: Discord.PollLayoutType.Default, // Single type (optional)
     }
+    if(roleCompare >= 1 && role.id == Member) {
+      await interaction.reply({
+        content: "You promoted: " + nomineeName + " to: " + roleName,
+        ephemeral: false,
+      }).then(async () => {
+        nominee.roles.add(role);
+      });
+    } else 
+    if(await roleCompare >= 0){
+      await interaction.reply({
+        content:"You nominated: " + nomineeName + " for promotion to: " + roleName,
+        ephemeral:true,
+    }).then(async () => {
+    await interaction.channel.send(
+    {content:"",
+    poll:poll
+    }).then(
+      async (message) => {
+        await message.startThread({
+          name: 'Nominated: ' + nomineeName + ' for ' + roleName,
+              autoArchiveDuration: 60,
+            reason: 'Thread for voting on member promotion',
+        })
+      }
+    )})     
   }
-});
+  else{
+    await interaction.reply({
+      content:"You cannot nominate someone for a role higher than your own",
+      ephemeral:true,
+  })
+  }
+  }catch(error){
+    console.log(error)
+  }
+  }}
+  );
 
 client.login(process.env.BOT_TOKEN);
-
-
-
-
