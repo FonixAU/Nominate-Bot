@@ -1,14 +1,27 @@
 require('dotenv/config')
 
 const Discord = require('discord.js')
-const client = new Discord.Client({ intents: ['Guilds','GuildMessagePolls']})
+const client = new Discord.Client({ intents: ['Guilds','GuildMessagePolls','GuildMembers'
+]})
 const BLANK = '1250623077214191678'
 const Member = '1250627277868240936'
 
-client.on('ready', () => {
+client.on('ready',async () => {
   // console.log(Logged in as ${client.user.tag}!)
+  client.user.setPresence({
+    activities: [{
+         type: Discord.ActivityType.Custom,
+         name: "custom", // name is exposed through the API but not shown in the client for ActivityType.Custom
+         state: "Pulling FoxMeDead's hair"
+    }]
+})
+// Testing member caching
+  // const guild = await client.guilds.fetch(process.env.GUILD_ID)
+  // await guild.members.fetch()
+  // const role = await guild.roles.fetch(BLANK)
+  // console.log(role.members.size)
   console.log('Bot turned on')
-});
+    });
 
 
 client.on('messagePollVoteAdd', async (pollVote,userID) => {
@@ -18,11 +31,12 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
   const totalNo = await poll.answers.at(1).voteCount
   const guild = await client.guilds.cache.get(process.env.GUILD_ID)
   const voter = await guild.members.fetch(userID)
+  await guild.members.fetch()
   const splitMessage = await poll.question.text.split(" ",2)
   const nominee = await (await guild.members.search({query:splitMessage[1],limit:1,cache:true})).at(0)
   try{
   if(poll.question.text.includes("BLANK")){
-    const role = await guild.roles.cache.get(BLANK)
+    const role = await guild.roles.fetch(BLANK)
     const roleCompare = await voter.roles.highest.comparePositionTo(role);
     // if(roleCompare >=1){
     //   await poll.message.reply({
@@ -64,7 +78,7 @@ client.on('messagePollVoteAdd', async (pollVote,userID) => {
       }
     }
   }else if(poll.question.text.includes("Member")){
-    const role = await guild.roles.cache.get(Member)
+    const role = await guild.roles.fetch(Member)
     const roleCompare = await voter.roles.highest.comparePositionTo(role);
     if(roleCompare >=1){
       await poll.message.reply({
@@ -170,7 +184,8 @@ client.on('interactionCreate', async (interaction) =>{
   })
   }
   }catch(error){
-    console.log(error)
+    // console.log(error)
+    console.log("double fire")
   }
   }}
   );
