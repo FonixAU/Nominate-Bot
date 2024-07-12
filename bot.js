@@ -1,8 +1,9 @@
 require('dotenv/config')
 
 const Discord = require('discord.js')
-const client = new Discord.Client({ intents: ['Guilds','GuildMessagePolls','GuildMembers'
-]})
+const client = new Discord.Client({ intents: ['Guilds','GuildMessagePolls','GuildMembers','GuildMessageReactions']
+                                    ,partials:[Discord.Partials.Message,Discord.Partials.Reaction]
+                                  })
 const BLANK = '1250623077214191678'
 const Member = '1250627277868240936'
 
@@ -12,17 +13,57 @@ client.on('ready',async () => {
     activities: [{
          type: Discord.ActivityType.Custom,
          name: "custom", // name is exposed through the API but not shown in the client for ActivityType.Custom
-         state: "Pulling FoxMeDead's hair"
+         state: "Wish FoxMeDead would let me die"
     }]
-})
-// Testing member caching
-  // const guild = await client.guilds.fetch(process.env.GUILD_ID)
-  // await guild.members.fetch()
-  // const role = await guild.roles.fetch(BLANK)
-  // console.log(role.members.size)
-  console.log('Bot turned on')
-    });
+    })
+    console.log('Bot turned on')
+  });
 
+  client.on('messageReactionRemove',async (reaction,user) =>{
+    const guild = await client.guilds.cache.get(process.env.GUILD_ID)
+    const member = await guild.members.fetch(user.id)
+    if(reaction.message.id != '1257948668192096286') return;
+  
+    if(reaction.emoji.name === '3musketeers')
+      {
+        const role = await guild.roles.fetch('1257540653982814229')
+        await member.roles.remove(role)
+      }
+      if(reaction.emoji.name === 'immortal')
+        {
+          const role = await guild.roles.fetch('1257540098342391849')
+          await member.roles.remove(role)
+        }
+      if(reaction.emoji.name === 'master')
+        {
+          const role = await guild.roles.fetch('1258638081641418753')
+          await member.roles.remove(role)
+        }
+    }
+);
+
+client.on('messageReactionAdd',async (reaction,user) =>{
+    const guild = await client.guilds.cache.get(process.env.GUILD_ID)
+    const member = await guild.members.fetch(user.id)
+    if(reaction.message.id != '1257948668192096286') return;
+  
+    if(reaction.emoji.name === '3musketeers')
+      {
+        const role = await guild.roles.fetch('1257540653982814229')
+        await member.roles.add(role)
+      }
+      if(reaction.emoji.name === 'immortal')
+        {
+          const role = await guild.roles.fetch('1257540098342391849')
+          await member.roles.add(role)
+        }
+      if(reaction.emoji.name === 'master')
+        {
+          const role = await guild.roles.fetch('1258638081641418753')
+          await member.roles.add(role)
+        }
+    }
+);
 
 client.on('messagePollVoteAdd', async (pollVote,userID) => {
   const poll = await pollVote.poll
@@ -191,3 +232,9 @@ client.on('interactionCreate', async (interaction) =>{
   );
 
 client.login(process.env.BOT_TOKEN);
+
+// Testing member caching
+  // const guild = await client.guilds.fetch(process.env.GUILD_ID)
+  // await guild.members.fetch()
+  // const role = await guild.roles.fetch(BLANK)
+  // console.log(role.members.size)
