@@ -1,0 +1,68 @@
+//Deprecating reaction roles
+// client.on("messageReactionRemove", async (reaction, user) => {
+//   const guild = await client.guilds.cache.get(process.env.GUILD_ID);
+//   const member = await guild.members.fetch(user.id);
+//   if (reaction.message.id != "1257948668192096286") return;
+
+//   if (reaction.emoji.name === "3musketeers") {
+//     const role = await guild.roles.fetch("1257540653982814229");
+//     await member.roles.remove(role);
+//   }
+//   if (reaction.emoji.name === "immortal") {
+//     const role = await guild.roles.fetch("1257540098342391849");
+//     await member.roles.remove(role);
+//   }
+//   if (reaction.emoji.name === "master") {
+//     const role = await guild.roles.fetch("1258638081641418753");
+//     await member.roles.remove(role);
+//   }
+//   if (reaction.emoji.name === "🟥") {
+//     const role = await guild.roles.fetch("1261238185980071976");
+
+//     await member.roles.remove(role);
+//   }
+//   if (reaction.emoji.name === "raid") {
+//     const role = await guild.roles.fetch("1261238404864020490");
+
+//     await member.roles.remove(role);
+//   }
+//   if (reaction.emoji.name === "destiny") {
+//     const role = await guild.roles.fetch("1261238399281664030");
+
+//     await member.roles.remove(role);
+//   }
+// });
+
+// client.on("messageReactionAdd", async (reaction, user) => {
+//   const guild = await client.guilds.cache.get(process.env.GUILD_ID);
+//   const member = await guild.members.fetch(user.id);
+//   if (reaction.message.id != "1257948668192096286") return;
+
+//   if (reaction.emoji.name === "3musketeers") {
+//     const role = await guild.roles.fetch("1257540653982814229");
+//     await member.roles.add(role);
+//   }
+//   if (reaction.emoji.name === "immortal") {
+//     const role = await guild.roles.fetch("1257540098342391849");
+//     await member.roles.add(role);
+//   }
+//   if (reaction.emoji.name === "master") {
+//     const role = await guild.roles.fetch("1258638081641418753");
+//     await member.roles.add(role);
+//   }
+//   if (reaction.emoji.name === "🟥") {
+//     const role = await guild.roles.fetch("1261238185980071976");
+
+//     await member.roles.add(role);
+//   }
+//   if (reaction.emoji.name === "raid") {
+//     const role = await guild.roles.fetch("1261238404864020490");
+
+//     await member.roles.add(role);
+//   }
+//   if (reaction.emoji.name === "destiny") {
+//     const role = await guild.roles.fetch("1261238399281664030");
+
+//     await member.roles.add(role);
+//   }
+// });
