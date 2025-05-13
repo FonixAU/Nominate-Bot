@@ -2,7 +2,13 @@ require("dotenv/config");
 
 const Discord = require("discord.js");
 const client = new Discord.Client({
-  intents: ["Guilds", "GuildMessagePolls", "GuildMembers", "GuildMessages", "MessageContent"],
+  intents: [
+    "Guilds",
+    "GuildMessagePolls",
+    "GuildMembers",
+    "GuildMessages",
+    "MessageContent",
+  ],
   partials: [Discord.Partials.Message, Discord.Partials.Reaction],
 });
 const BLANK = "1250623077214191678";
@@ -16,48 +22,57 @@ client.on("ready", async () => {
       {
         type: Discord.ActivityType.Custom,
         name: "custom", // name is exposed through the API but not shown in the client for ActivityType.Custom
-        state: "/nominate",
+        state:"use me so Fox can go broke",
       },
     ],
   });
   console.log("Bot turned on");
 });
 //minimising LFG clutter
-client.on("messageCreate", async (message) =>{
-  if (message.channel.name.includes("lfg"))
-    {
-      if(message.mentions.roles.size > 0){
-        if(message.mentions.roles.each((role)=>{
-          return(role.mentionable)
-        })){
+client.on("messageCreate", async (message) => {
+  if (message.channel.name.includes("lfg")) {
+    if (message.mentions.roles.size > 0) {
+      if (
+        message.mentions.roles.each((role) => {
+          return role.mentionable;
+        })
+      ) {
         //parse integers
         const regex = /\d{1,2}(?!<)(?!\d)(?!>)/;
         // Test the message and extract the integer if present
         const match = message.content.match(regex);
         // If a match is found, return the integer, otherwise return null
-        try
-        {if (match) {
+        try {
+          if (match) {
             const lfg_count = parseInt(match[0], 10);
             const thread = await message.startThread({
-              name: message.author.displayName + " needs "+ lfg_count +" people for " + message.mentions.roles.first().name,
+              name:
+                message.author.displayName +
+                " needs " +
+                lfg_count +
+                " people for " +
+                message.mentions.roles.first().name,
               autoArchiveDuration: 60,
               reason: "Thread for LFGs",
             });
-            thread.send("Auto archives after 60min of inactivity")
-
-        } else {
-          const thread = await message.startThread({
-            name: message.author.displayName + " needs people for " + message.mentions.roles.first().name,
-            autoArchiveDuration: 60,
-            reason: "Thread for LFGs",
-          });
-          thread.send("Auto archives after 60min of inactivity")
-        }}
-        catch (e) {
-          console.log(" " + e + " ")
+            thread.send("Auto archives after 60min of inactivity");
+          } else {
+            const thread = await message.startThread({
+              name:
+                message.author.displayName +
+                " needs people for " +
+                message.mentions.roles.first().name,
+              autoArchiveDuration: 60,
+              reason: "Thread for LFGs",
+            });
+            thread.send("Auto archives after 60min of inactivity");
+          }
+        } catch (e) {
+          console.log(" " + e + " ");
         }
-      }}
-    };
+      }
+    }
+  }
 });
 
 client.on("messagePollVoteAdd", async (pollVote, userID) => {
@@ -244,8 +259,38 @@ client.on("interactionCreate", async (interaction) => {
       console.log("double fire");
     }
   }
+
+  if (
+    (await interaction.isCommand()) &&
+    (await interaction.commandName) === "timestamp"
+  ) {
+    const time = interaction.options.getString('time'); // e.g., "13:45"
+    const date = interaction.options.getString('date'); // e.g., "2025-06-12"
+  
+    try {
+      const dateTime = new Date(`${date}T${time}:00`);
+      const unix = Math.floor(dateTime.getTime() / 1000);
+  
+      if (isNaN(unix)) throw new Error("Invalid date");
+  
+      await interaction.reply(`🕒 <t:${unix}:F>`);
+    } catch (err) {
+      await interaction.reply({
+        content: "❌ Invalid date or time format. Use `YYYY-MM-DD` and `HH:MM` (24-hour).",
+        ephemeral: true
+      });
+    }
+  }
 });
 
+client.on("interactionCreate", async (interaction) => {
+  if (
+    (await interaction.isCommand()) &&
+    (await interaction.commandName) === "timestamp"
+  ) {
+
+  }
+});
 client.login(process.env.BOT_TOKEN);
 
 // Testing member caching

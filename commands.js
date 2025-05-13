@@ -9,9 +9,9 @@ const rest = new REST().setToken(botToken)
 const commandRegister = async () => {
     try {
         //clear all commands to avoid duplicates
-            await rest.put(Routes.applicationGuildCommands(botID, serverID), { body: [] })
-            .then(() => console.log('Successfully deleted all commands.'))
-            .catch(console.error);
+        await rest.put(Routes.applicationGuildCommands(botID, serverID), { body: [] })
+        .then(() => console.log('Successfully deleted all commands.'))
+        .catch(console.error);
 
         //when done for multi-server registration do:
         //await rest.put(Routes.applicationCommands(botID)
@@ -35,8 +35,24 @@ const commandRegister = async () => {
                         { name: 'BLANK', value: '1250623077214191678' },
                         { name: 'Member', value: '1250627277868240936' },
                     )),
-        ]
-        })
+            new SlashCommandBuilder()        
+            .setName("timestamp")
+                .setDescription("Generate a Discord timestamp from time and date")
+                .addStringOption(option =>
+                      option
+                        .setName("time")
+                        .setDescription("Time in HH:MM (24-hour)")
+                        .setRequired(true)
+                    )
+                    .addStringOption(option =>
+                      option
+                        .setName("date")
+                        .setDescription("Date in YYYY-MM-DD format")
+                        .setRequired(true)
+                    ),
+            ]
+        }
+    )
         
         console.log("Successfully registered application commands")
     }catch(error) {
