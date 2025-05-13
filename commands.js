@@ -39,17 +39,26 @@ const commandRegister = async () => {
             .setName("timestamp")
                 .setDescription("Generate a Discord timestamp from time and date")
                 .addStringOption(option =>
-                      option
+                    option
                         .setName("time")
                         .setDescription("Time in HH:MM (24-hour)")
                         .setRequired(true)
                     )
-                    .addStringOption(option =>
-                      option
+                .addStringOption(option =>
+                    option
                         .setName("date")
                         .setDescription("Date in YYYY-MM-DD format")
                         .setRequired(true)
-                    ),
+                    )
+                .addStringOption(option =>
+                    option.setName('tz')
+                          .setDescription('Timezone abbreviation (e.g. PST, AEST)')
+                          .setRequired(false))
+                .addStringOption(option =>
+                    option.setName('timezone')
+                          .setDescription('Context aware timezone (e.g. America/Los_Angeles)')
+                          .setRequired(false))
+                ,
             ]
         }
     )

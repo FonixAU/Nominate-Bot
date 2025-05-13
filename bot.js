@@ -1,5 +1,39 @@
 require("dotenv/config");
 
+const timezoneMap = {
+  // US
+  PST: "America/Los_Angeles",
+  PDT: "America/Los_Angeles",
+  MST: "America/Denver",
+  MDT: "America/Denver",
+  CST: "America/Chicago",
+  CDT: "America/Chicago",
+  EST: "America/New_York",
+  EDT: "America/New_York",
+
+  // UK/EU
+  GMT: "Etc/GMT",
+  BST: "Europe/London",
+  CET: "Europe/Paris",
+  CEST: "Europe/Paris",
+
+  // AU/NZ
+  AEST: "Australia/Sydney",
+  AEDT: "Australia/Sydney",
+  ACST: "Australia/Adelaide",
+  ACDT: "Australia/Adelaide",
+  AWST: "Australia/Perth",
+  NZST: "Pacific/Auckland",
+  NZDT: "Pacific/Auckland",
+
+  // Asia
+  IST: "Asia/Kolkata",
+  JST: "Asia/Tokyo",
+
+  // Global
+  UTC: "Etc/UTC",
+};
+
 const Discord = require("discord.js");
 const client = new Discord.Client({
   intents: [
@@ -264,33 +298,48 @@ client.on("interactionCreate", async (interaction) => {
     (await interaction.isCommand()) &&
     (await interaction.commandName) === "timestamp"
   ) {
-    const time = interaction.options.getString('time'); // e.g., "13:45"
-    const date = interaction.options.getString('date'); // e.g., "2025-06-12"
-  
-    try {
-      const dateTime = new Date(`${date}T${time}:00`);
-      const unix = Math.floor(dateTime.getTime() / 1000);
-  
-      if (isNaN(unix)) throw new Error("Invalid date");
-  
-      await interaction.reply(`🕒 <t:${unix}:F>`);
-    } catch (err) {
+    const time = interaction.options.getString('time');
+    const date = interaction.options.getString('date');
+    const tzAbbr = interaction.options.getString('tz');
+    const tzFull = interaction.options.getString('timezone');
+
+    const zone =
+      tzFull?.trim() ||
+      timezoneMap[tzAbbr?.trim()?.toUpperCase()] ||
+      null;
+
+    if (!zone) {
       await interaction.reply({
-        content: "❌ Invalid date or time format. Use `YYYY-MM-DD` and `HH:MM` (24-hour).",
-        ephemeral: true
+        content: `❌ Please provide a valid \`tz\` (abbreviation) or \`timezone\` (e.g. America/New_York).`,
+        ephemeral: true,
       });
+      return;
     }
+
+    const [hour, minute] = time.split(":").map(Number);
+    const [year, month, day] = date.split("-").map(Number);
+
+    const dt = DateTime.fromObject(
+      { year, month, day, hour, minute },
+      { zone }
+    );
+
+    if (!dt.isValid) {
+      await interaction.reply({
+        content: `❌ Invalid date, time, or timezone. Make sure you're using 24-hour format and a supported timezone.`,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const unix = Math.floor(dt.toSeconds());
+    await interaction.reply({
+      content: `🕒 Here's your timestamp: <t:${unix}:F> (<t:${unix}:R>)`,
+      ephemeral: false,
+    });
   }
 });
 
-client.on("interactionCreate", async (interaction) => {
-  if (
-    (await interaction.isCommand()) &&
-    (await interaction.commandName) === "timestamp"
-  ) {
-
-  }
-});
 client.login(process.env.BOT_TOKEN);
 
 // Testing member caching
