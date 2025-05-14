@@ -302,11 +302,9 @@ client.on("interactionCreate", async (interaction) => {
     const date = interaction.options.getString('date');
     const tzAbbr = interaction.options.getString('tz');
     const tzFull = interaction.options.getString('timezone');
-
-    const zone =
-      tzFull?.trim() ||
-      timezoneMap[tzAbbr?.trim()?.toUpperCase()] ||
-      null;
+    var zone;
+    if(tzAbbr){zone = timezoneMap[tzAbbr?.trim()?.toUpperCase()]}
+    else if(tzFull){zone = tzFull?.trim()}
 
     if (!zone) {
       await interaction.reply({
@@ -334,7 +332,7 @@ client.on("interactionCreate", async (interaction) => {
 
     const unix = Math.floor(dt.toSeconds());
     await interaction.reply({
-      content: `🕒 Here's your timestamp: <t:${unix}:F> (<t:${unix}:R>)`,
+      content: `🕒 Here's your timestamp: <t:${unix}:F>, (<t:${unix}:R>)`,
       ephemeral: false,
     });
   }
