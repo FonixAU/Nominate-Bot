@@ -303,8 +303,8 @@ client.on("interactionCreate", async (interaction) => {
     const tzAbbr = interaction.options.getString('tz');
     const tzFull = interaction.options.getString('timezone');
     var zone;
-    if(tzAbbr){zone = timezoneMap[tzAbbr?.trim()?.toUpperCase()]}
-    else if(tzFull){zone = tzFull?.trim()}
+    if(tzAbbr){zone = timezoneMap[tzAbbr.trim()?.toUpperCase()]}
+    else if(tzFull){zone = tzFull.trim()}
 
     if (!zone) {
       await interaction.reply({
