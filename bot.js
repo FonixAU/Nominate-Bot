@@ -325,7 +325,7 @@ client.on("interactionCreate", async (interaction) => {
 
     if (!dt.isValid) {
       await interaction.reply({
-        content: `❌ Invalid date, time, or timezone. Make sure you're using 24-hour format and a supported timezone.`,
+        content: `❌ Invalid date, time, or timezone. Make sure you're using 24-hour format, didn't forget any - or : and are using a supported timezone.`,
         ephemeral: true,
       });
       return;
@@ -333,7 +333,7 @@ client.on("interactionCreate", async (interaction) => {
 
     const unix = Math.floor(dt.toSeconds());
     await interaction.reply({
-      content: `🕒 Here's your timestamp: <t:${unix}:F>, (<t:${unix}:R>)`,
+      content: `<t:${unix}:F>, (<t:${unix}:R>)`,
       ephemeral: false,
     });
   }
