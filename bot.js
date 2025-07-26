@@ -40,6 +40,7 @@ const client = new Discord.Client({
   intents: [
     "Guilds",
     "GuildMessagePolls",
+    "GuildVoiceStates",
     "GuildMembers",
     "GuildMessages",
     "MessageContent",
@@ -48,6 +49,8 @@ const client = new Discord.Client({
 });
 const BLANK = "1250623077214191678";
 const Member = "1250627277868240936";
+const CREATE_CHANNEL_ID = '1397809101345525760'; 
+const CATEGORY_ID = '1250018152826408962'; 
 
 //turning bot on
 client.on("ready", async () => {
@@ -336,6 +339,42 @@ client.on("interactionCreate", async (interaction) => {
       content: `<t:${unix}:F>, (<t:${unix}:R>)`,
       ephemeral: false,
     });
+  }
+});
+
+client.on('voiceStateUpdate', async (oldState, newState) => {
+  // Only act when a user joins the "Create Channel"
+  if (newState.channelId === CREATE_CHANNEL_ID && oldState.channelId !== CREATE_CHANNEL_ID) {
+    const guild = newState.guild;
+    const user = newState.member;
+    // Create a new temporary voice channel
+    const tempChannel = await guild.channels.create({
+      name: `${user.user.username}'s Channel`,
+      type: Discord.ChannelType.GuildVoice,
+      parent: CATEGORY_ID || null,
+      permissionOverwrites: [
+        {
+          id: guild.roles.everyone,
+          allow: [Discord.PermissionsBitField.Flags.Connect, Discord.PermissionsBitField.Flags.ViewChannel],
+        },
+        {
+          id: user.id,
+          allow: [Discord.PermissionsBitField.Flags.MuteMembers, Discord.PermissionsBitField.Flags.MoveMembers],
+        },
+      ],
+    });
+
+    // Move the user to the new voice channel
+    await user.voice.setChannel(tempChannel);
+
+    // Optional: Monitor when the channel becomes empty
+    const checkEmpty = setInterval(async () => {
+      const freshChannel = await guild.channels.fetch(tempChannel.id);
+      if (freshChannel && freshChannel.members.size === 0) {
+        await tempChannel.delete().catch(console.error);
+        clearInterval(checkEmpty);
+      }
+    }, 1000); // Check every 10 seconds
   }
 });
 
