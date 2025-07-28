@@ -374,7 +374,7 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
         await tempChannel.delete().catch(console.error);
         clearInterval(checkEmpty);
       }
-    }, 1000); // Check every 10 seconds
+    }, 1000); // Check every 1 seconds
   }
 });
 
