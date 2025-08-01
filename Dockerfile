@@ -1,40 +1,45 @@
-# syntax = docker/dockerfile:1
+# syntax=docker/dockerfile:1
 
-# Adjust NODE_VERSION as desired
-ARG NODE_VERSION=20.18.0
+ARG NODE_VERSION=22.13.1
 FROM node:${NODE_VERSION}-slim AS base
-
 LABEL fly_launch_runtime="Node.js"
-
-# Node.js app lives here
 WORKDIR /app
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# Set production environment
-ENV NODE_ENV="production"
+# Create a non-root user
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
-
-# Throw-away build stage to reduce size of final image
+# Build stage
 FROM base AS build
 
-# Install packages needed to build node modules
+# Install build dependencies
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential node-gyp pkg-config python-is-python3
+    apt-get install --no-install-recommends -y build-essential python3 pkg-config && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install node modules
-COPY package-lock.json package.json ./
-RUN npm ci
+# Copy only package files first for better cache usage
+COPY --link package.json package-lock.json ./
 
-# Copy application code
-COPY . .
+# Install dependencies with cache
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev
 
+# Copy application source code (excluding files in .dockerignore)
+COPY --link . .
 
-# Final stage for app image
-FROM base
+# Production image
+FROM base AS final
 
-# Copy built application
+# Copy app and node_modules from build stage
 COPY --from=build /app /app
 
-# Start the server by default, this can be overwritten at runtime
+# Set permissions and switch to non-root user
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+# Expose port if needed (Discord bots usually don't listen on HTTP, but for completeness)
 EXPOSE 3000
-CMD [ "node", "commands.js" ]
-CMD [ "npm", "run", "start" ]
+
+# Start the bot
+CMD ["npm", "start"]

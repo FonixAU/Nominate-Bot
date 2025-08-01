@@ -1,6 +1,58 @@
-/.git
-/node_modules
-.dockerignore
-.env
-Dockerfile
-fly.toml
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+
+# Version control
+.git/
+.gitignore
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment and secrets
+.env*
+*.env
+*.pem
+*.key
+*.crt
+config.local.*
+*.local.yml
+
+# Build and output directories
+dist/
+build/
+out/
+tmp/
+temp/
+*.tmp
+
+# Documentation
+README*
+*.md
+docs/
+
+# Docker and Compose files
+Dockerfile*
+docker-compose*
+
+# Miscellaneous
+*.log
+
+# Nix and development files
+.idx/
+
+# Examples and test files
+examples/
+test/
+tests/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Exclude fly.toml (deployment config) and package-lock.json (required for reproducible builds)
+# (Do not ignore package-lock.json as per instructions)

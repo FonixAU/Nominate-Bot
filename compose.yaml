@@ -1,0 +1,16 @@
+services:
+  javascript-app:
+    build:
+      context: .
+    container_name: javascript-app
+    restart: unless-stopped
+    init: true
+    # Expose port 3000 as per Dockerfile (not typically used for Discord bots, but included for completeness)
+    ports:
+      - "3000:3000"
+    # Use env_file if .env exists
+    env_file: ./.env
+    # If .env is not present, comment out the above line:
+    # env_file: ./.env  # Uncomment if .env file exists
+    # No external dependencies detected (e.g., database, cache)
+    # No volumes needed as this is not a database or persistent service
