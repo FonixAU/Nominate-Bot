@@ -3,7 +3,7 @@ services:
     build:
       context: .
     container_name: javascript-app
-    restart: unless-stopped
+    restart: always
     init: true
     # Expose port 3000 as per Dockerfile (not typically used for Discord bots, but included for completeness)
     ports:
