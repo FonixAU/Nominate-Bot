@@ -49,6 +49,7 @@ const client = new Discord.Client({
 });
 const BLANK = "1250623077214191678";
 const Member = "1250627277868240936";
+const Booster = "1397533833783410779";
 const CREATE_CHANNEL_ID = '1397809101345525760'; 
 const CATEGORY_ID = '1250018152826408962'; 
 
@@ -341,7 +342,7 @@ client.on("interactionCreate", async (interaction) => {
     });
   }
 });
-
+// Voice channel creator
 client.on('voiceStateUpdate', async (oldState, newState) => {
   // Only act when a user joins the "Create Channel"
   if (newState.channelId === CREATE_CHANNEL_ID && oldState.channelId !== CREATE_CHANNEL_ID) {
@@ -377,6 +378,9 @@ client.on('voiceStateUpdate', async (oldState, newState) => {
     }, 1000); // Check every 1 seconds
   }
 });
+
+//Server booster benefits
+
 
 client.login(process.env.BOT_TOKEN);
 
