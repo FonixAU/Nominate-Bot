@@ -1,8 +1,8 @@
 services:
-  javascript-app:
+  nominate-bot:
     build:
       context: .
-    container_name: javascript-app
+    container_name: nominate-bot
     restart: always
     init: true
     # Expose port 3000 as per Dockerfile (not typically used for Discord bots, but included for completeness)
